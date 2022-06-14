@@ -136,6 +136,39 @@ public class ExportCampaignServiceTest {
 
         Row surveysHeaderRow = sheet.getRow(8);
         Assertions.assertThat(surveysHeaderRow).isNotNull();
+        Assertions.assertThat(surveysHeaderRow.getCell(1)).isNotNull();
+        Assertions.assertThat(surveysHeaderRow.getCell(1).getStringCellValue()).isEqualTo("streee");
+
+        Assertions.assertThat(surveysHeaderRow).isNotNull();
+        Assertions.assertThat(surveysHeaderRow.getCell(2)).isNotNull();
+        Assertions.assertThat(surveysHeaderRow.getCell(2).getStringCellValue()).isEqualTo("Postal code");
+
+        Assertions.assertThat(surveysHeaderRow).isNotNull();
+        Assertions.assertThat(surveysHeaderRow.getCell(3)).isNotNull();
+        Assertions.assertThat(surveysHeaderRow.getCell(3).getStringCellValue()).isEqualTo("City");
+
+        Assertions.assertThat(surveysHeaderRow).isNotNull();
+        Assertions.assertThat(surveysHeaderRow.getCell(4)).isNotNull();
+        Assertions.assertThat(surveysHeaderRow.getCell(4).getStringCellValue()).isEqualTo("Status");
+
+        Row campaignResultsRow = sheet.getRow(9);
+        Assertions.assertThat(campaignResultsRow.getCell(0)).isNotNull();
+        Assertions.assertThat(campaignResultsRow.getCell(1)).isNotNull();
+        Assertions.assertThat(campaignResultsRow.getCell(2)).isNotNull();
+        Assertions.assertThat(campaignResultsRow.getCell(3)).isNotNull();
+        Assertions.assertThat(campaignResultsRow.getCell(4)).isNotNull();
+
+        int campaignSize = campaign.getAddressStatuses().size();
+        int lastResultRow = 9 + campaignSize - 1;
+
+        Row campaignLastResultsRow = sheet.getRow(lastResultRow);
+        Assertions.assertThat(campaignLastResultsRow.getCell(0)).isNotNull();
+        Assertions.assertThat(campaignLastResultsRow.getCell(1)).isNotNull();
+        Assertions.assertThat(campaignLastResultsRow.getCell(2)).isNotNull();
+        Assertions.assertThat(campaignLastResultsRow.getCell(3)).isNotNull();
+        Assertions.assertThat(campaignLastResultsRow.getCell(4)).isNotNull();
+
+
 
     }
 }

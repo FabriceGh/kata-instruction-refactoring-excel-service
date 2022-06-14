@@ -1,0 +1,21 @@
+{
+    "id": "surveyId",
+    "sommary": "sommary",
+    "client": "client's name",
+    "clientAddress": {
+        "id": "addressId1",
+        "streetNumber": "10",
+        "streetName": "rue de Rivoli",
+        "postalCode": "75001",
+        "city": "Paris"
+    },
+    "questions": [{
+            "id": "questionId1",
+            "question": "question1"
+        },
+        {
+            "id": "questionId2",
+            "question": "question2"
+        }
+    ]
+}

@@ -127,7 +127,7 @@ public class WorkbookFormatterTest {
 
         String clientAddress = surveyMock.getClientAddress().getStreetNumber() 
                                 + " " + surveyMock.getClientAddress().getStreetName() 
-                                + surveyMock.getClientAddress().getPostalCode() 
+                                + " " + surveyMock.getClientAddress().getPostalCode() 
                                 + " " + surveyMock.getClientAddress().getCity();
 
         Sheet sheet = workbookMock.getSheet("Survey");

@@ -11,130 +11,204 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.newlight77.kata.survey.model.Address;
 import com.newlight77.kata.survey.model.AddressStatus;
 import com.newlight77.kata.survey.model.Campaign;
 import com.newlight77.kata.survey.model.Survey;
 
 public class WorkbookFormatter {
 
-    public static Workbook formatCampaignToWorkbook(Campaign campaign, Survey survey) {
-        Workbook workbook = new XSSFWorkbook();
+  static final int workbookHeaderColumnWidth = 10500;
+  static final String workbookSheetName = "Survey";
+  static final int workbookColumnWidth = 6000;
+  static final int workbookMinColumnIndexToSetColumnWidth = 1;
+  static final int workbookMaxColumnIndexToSetColumnWidth = 18;
+  static final String workbookHeaderFont = "Arial";
+  static final short workbookHeaderFontSize = 14;
+  static final boolean workbookHeaderFontIsBold = true;
+  static final boolean workbookHeaderIsTextWrapped = false;
+  static final String workbookTitleFont = "Arial";
+  static final short workbookTitleFontSize = 12;
+  static final String workbookHeaderCol0Label = "Survey";
+  static final boolean workbookDataIsTextWrapped = true;
+
+  static final String workbookRow2Col0Label = "Client";
+
+  static final String workbookRow6Col0Label = "Number of surveys";
+
+  static final String workbookRow8Col0Label = "N° street";
+  static final String workbookRow8Col1Label = "streee";
+  static final String workbookRow8Col2Label = "Postal code";
+  static final String workbookRow8Col3Label = "City";
+  static final String workbookRow8Col4Label = "Status";
+
+  static final int workbookSurveyDataStartRowIndex = 9;
+
+  public static Workbook formatCampaignToWorkbook(Campaign campaign, Survey survey) {
+
+    Workbook campaignResultsWorkbook = createWorkbook();
+
+    CellStyle headerStyle = getHeaderStyle(campaignResultsWorkbook);
+    CellStyle titleStyle = getTitleStyle(campaignResultsWorkbook);
+    CellStyle defaultStyle = getDefaultStyle(campaignResultsWorkbook);
+
+    Sheet surveySheet = createSurveySheet(campaignResultsWorkbook);
+
+    Row surveySheetHeader = createRow(surveySheet, 0);
+    Cell headerTitleLabel = createCell(surveySheetHeader, 0, workbookHeaderCol0Label, headerStyle);
+
+    Row surveySheetClientLabel = createRow(surveySheet, 2);
+    Cell clientLabel = createCell(surveySheetClientLabel, 0, workbookRow2Col0Label, titleStyle);
+    Row surveySheetClientInfo = createRow(surveySheet, 3);
+    Cell clientInfo = createCell(surveySheetClientInfo, 0, survey.getClient(), defaultStyle);
     
-        Sheet sheet = workbook.createSheet("Survey");
-        sheet.setColumnWidth(0, 10500);
-        for (int i = 1; i <= 18; i++) {
-          sheet.setColumnWidth(i, 6000);
-        }
+    Row surveySheetClientAddressInfo = createRow(surveySheet, 4);
+    Cell clientAddress = createCell(surveySheetClientAddressInfo, 0, formatClientAddress(survey.getClientAddress()), defaultStyle);
+
+    Row surveySheetSurveyDataInfo = createRow(surveySheet, 6);
+    Cell numberOfSurveysLabel = createCell(surveySheetSurveyDataInfo, 0, workbookRow6Col0Label);
+    Cell numberOfSurveys = createCell(surveySheetSurveyDataInfo, 1, campaign.getAddressStatuses().size());
+
+    Row surveySheetSurveyDataHeader = createRow(surveySheet, 8);
+    Cell streetNumberLabel = createCell(surveySheetSurveyDataHeader, 0, workbookRow8Col0Label);
+    Cell streetLabel = createCell(surveySheetSurveyDataHeader, 1, workbookRow8Col1Label);
+    Cell postalCodeLabel = createCell(surveySheetSurveyDataHeader, 2, workbookRow8Col2Label);
+    Cell cityLabel = createCell(surveySheetSurveyDataHeader, 3, workbookRow8Col3Label);
+    Cell statusLabel = createCell(surveySheetSurveyDataHeader, 4, workbookRow8Col4Label);
+
+    int currentIndex = workbookSurveyDataStartRowIndex;
+
+    for (AddressStatus addressStatus : campaign.getAddressStatuses()) {
+
+      Row surveySheetSurveyData = createRow(surveySheet, currentIndex);
+      Cell streetNumber = createCell(surveySheetSurveyData, 0, addressStatus.getAddress().getStreetNumber(), defaultStyle);
+      Cell streetName = createCell(surveySheetSurveyData, 1, addressStatus.getAddress().getStreetName(), defaultStyle);
+      Cell streetPostalCode = createCell(surveySheetSurveyData, 2, addressStatus.getAddress().getPostalCode(), defaultStyle);
+      Cell streetCity = createCell(surveySheetSurveyData, 3, addressStatus.getAddress().getCity(), defaultStyle);
+      Cell status = createCell(surveySheetSurveyData, 4, addressStatus.getStatus().toString(), defaultStyle);
+
+      currentIndex++;
+
+    }
+
+    return campaignResultsWorkbook;
+
+  }
+
+  private static Workbook createWorkbook(){
+    return new XSSFWorkbook();
+  }
+
+  private static Sheet createSurveySheet(Workbook workbook){
+
+    Sheet sheet = workbook.createSheet(workbookSheetName);
+    sheet.setColumnWidth(0, workbookHeaderColumnWidth);
+
+    for (int i = workbookMinColumnIndexToSetColumnWidth; i <= workbookMaxColumnIndexToSetColumnWidth; i++) {
+      sheet.setColumnWidth(i, workbookColumnWidth);
+    }
+
+    return sheet;
+  }
+
+  private static Row createRow(Sheet sheet, int rowIndex){
+
+    return sheet.createRow(rowIndex);
+
+  }
+
+  private static Cell createCell(Row row, int colIndex, String value, CellStyle style){
+
+    Cell cell = row.createCell(colIndex);
+    cell.setCellValue(value);
+    cell.setCellStyle(style);
+
+    return cell;
+
+  }
+
+  private static Cell createCell(Row row, int colIndex, String value){
+
+    Cell cell = row.createCell(colIndex);
+    cell.setCellValue(value);
+
+    return cell;
+
+  }
+
+  private static Cell createCell(Row row, int colIndex, int value){
+
+    Cell cell = row.createCell(colIndex);
+    cell.setCellValue(value);
+
+    return cell;
+
+  }
+
+  private static CellStyle getHeaderStyle(Workbook workbook){
+
+    CellStyle headerStyle = workbook.createCellStyle();
+    headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+    headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+    headerStyle.setFont(getHeaderFont(workbook));
+    headerStyle.setWrapText(workbookHeaderIsTextWrapped);
+
+    return headerStyle;
+
+  }
+
+  private static CellStyle getTitleStyle(Workbook workbook){
+
+    CellStyle titleStyle = workbook.createCellStyle();
+    titleStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+    titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
     
-        // 1ere ligne =  l'entête
-        Row header = sheet.createRow(0);
+    titleStyle.setFont(getTitleFont(workbook));
+
+    return titleStyle;
+
+  }
+
+  private static CellStyle getDefaultStyle(Workbook workbook){
+
+    CellStyle defaulSstyle = workbook.createCellStyle();
+    defaulSstyle.setWrapText(workbookDataIsTextWrapped);
+
+    return defaulSstyle;
+
+  }
+
+  private static XSSFFont getTitleFont(Workbook workbook){
+
+    XSSFFont titleFont = ((XSSFWorkbook) workbook).createFont();
+    titleFont.setFontName(workbookTitleFont);
+    titleFont.setFontHeightInPoints(workbookTitleFontSize);
+    titleFont.setUnderline(FontUnderline.SINGLE);
+
+    return titleFont;
     
-        CellStyle headerStyle = workbook.createCellStyle();
-        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+  }
+
+  private static XSSFFont getHeaderFont(Workbook workbook){
+
+    XSSFFont headerFont = ((XSSFWorkbook) workbook).createFont();
+    headerFont.setFontName(workbookHeaderFont);
+    headerFont.setFontHeightInPoints(workbookHeaderFontSize);
+    headerFont.setBold(workbookHeaderFontIsBold);
+
+    return headerFont;
     
-        XSSFFont font = ((XSSFWorkbook) workbook).createFont();
-        font.setFontName("Arial");
-        font.setFontHeightInPoints((short) 14);
-        font.setBold(true);
-        headerStyle.setFont(font);
-        headerStyle.setWrapText(false);
-    
-        Cell headerCell = header.createCell(0);
-        headerCell.setCellValue("Survey");
-        headerCell.setCellStyle(headerStyle);
-    
-        CellStyle titleStyle = workbook.createCellStyle();
-        titleStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
-        titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        XSSFFont titleFont = ((XSSFWorkbook) workbook).createFont();
-        titleFont.setFontName("Arial");
-        titleFont.setFontHeightInPoints((short) 12);
-        titleFont.setUnderline(FontUnderline.SINGLE);
-        titleStyle.setFont(titleFont);
-    
-        CellStyle style = workbook.createCellStyle();
-        style.setWrapText(true);
-    
-        // section client
-        Row row = sheet.createRow(2);
-        Cell cell = row.createCell(0);
-        cell.setCellValue("Client");
-        cell.setCellStyle(titleStyle);
-    
-        Row clientRow = sheet.createRow(3);
-        Cell nomClientRowLabel = clientRow.createCell(0);
-        nomClientRowLabel.setCellValue(survey.getClient());
-        nomClientRowLabel.setCellStyle(style);
-    
-        String clientAddress = survey.getClientAddress().getStreetNumber() + " "
-                + survey.getClientAddress().getStreetName() + survey.getClientAddress().getPostalCode() + " "
-                + survey.getClientAddress().getCity();
-    
-        Row clientAddressLabelRow = sheet.createRow(4);
-        Cell clientAddressCell = clientAddressLabelRow.createCell(0);
-        clientAddressCell.setCellValue(clientAddress);
-        clientAddressCell.setCellStyle(style);
-    
-        row = sheet.createRow(6);
-        cell = row.createCell(0);
-        cell.setCellValue("Number of surveys");
-        cell = row.createCell(1);
-        cell.setCellValue(campaign.getAddressStatuses().size());
-    
-        Row surveyLabelRow = sheet.createRow(8);
-        Cell surveyLabelCell = surveyLabelRow.createCell(0);
-        surveyLabelCell.setCellValue("N° street");
-        surveyLabelCell.setCellStyle(style);
-    
-        surveyLabelCell = surveyLabelRow.createCell(1);
-        surveyLabelCell.setCellValue("streee");
-        surveyLabelCell.setCellStyle(style);
-    
-        surveyLabelCell = surveyLabelRow.createCell(2);
-        surveyLabelCell.setCellValue("Postal code");
-        surveyLabelCell.setCellStyle(style);
-    
-        surveyLabelCell = surveyLabelRow.createCell(3);
-        surveyLabelCell.setCellValue("City");
-        surveyLabelCell.setCellStyle(style);
-    
-        surveyLabelCell = surveyLabelRow.createCell(4);
-        surveyLabelCell.setCellValue("Status");
-        surveyLabelCell.setCellStyle(style);
-    
-        int startIndex = 9;
-        int currentIndex = 0;
-    
-        for (AddressStatus addressStatus : campaign.getAddressStatuses()) {
-    
-          Row surveyRow = sheet.createRow(startIndex + currentIndex);
-          Cell surveyRowCell = surveyRow.createCell(0);
-          surveyRowCell.setCellValue(addressStatus.getAddress().getStreetNumber());
-          surveyRowCell.setCellStyle(style);
-    
-          surveyRowCell = surveyRow.createCell(1);
-          surveyRowCell.setCellValue(addressStatus.getAddress().getStreetName());
-          surveyRowCell.setCellStyle(style);
-    
-          surveyRowCell = surveyRow.createCell(2);
-          surveyRowCell.setCellValue(addressStatus.getAddress().getPostalCode());
-          surveyRowCell.setCellStyle(style);
-    
-          surveyRowCell = surveyRow.createCell(3);
-          surveyRowCell.setCellValue(addressStatus.getAddress().getCity());
-          surveyRowCell.setCellStyle(style);
-    
-          surveyRowCell = surveyRow.createCell(4);
-          surveyRowCell.setCellValue(addressStatus.getStatus().toString());
-          surveyRowCell.setCellStyle(style);
-    
-          currentIndex++;
-    
-        }
-    
-        return workbook;
-    
-      }
-    
+  }
+
+  private static String formatClientAddress(Address clientAddress){
+    String formattedClientAddress = String.format("%s %s %s %s"
+      , clientAddress.getStreetNumber()
+      , clientAddress.getStreetName()
+      , clientAddress.getPostalCode()
+      , clientAddress.getCity());
+
+        return formattedClientAddress;
+  }
+
 }
